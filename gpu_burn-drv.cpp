@@ -280,7 +280,15 @@ template <class T> class GPU_Test
 
         void initCompareKernel() {
 
-            const char *kernelFile = "compare.ptx";
+            // FIXME: make ptx location flexible
+            std::string ptx_loc = std::string(getenv("RP_PTX_PATH"));
+            std::string ptx_mod = std::string("compare.ptx");
+
+            if (!ptx_loc.empty()) {
+                ptx_mod.insert(0, ptx_loc);
+            }
+
+            const char *kernelFile = ptx_mod.c_str();
             {
                 std::ifstream f(kernelFile);
                 checkError(f.good() ? CUDA_SUCCESS : CUDA_ERROR_NOT_FOUND,
