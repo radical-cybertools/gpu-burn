@@ -165,8 +165,12 @@ template <class T> class GPU_Test
             cuDeviceGetAttribute(&pci_dom, CU_DEVICE_ATTRIBUTE_PCI_DOMAIN_ID, dev);
             cuDeviceGetAttribute(&pci_bus, CU_DEVICE_ATTRIBUTE_PCI_BUS_ID,    dev);
             cuDeviceGetAttribute(&pci_dev, CU_DEVICE_ATTRIBUTE_PCI_DEVICE_ID, dev);
-            printf("Device: %d : %s : %d : %d : %d\n",
-                   dev, name, pci_dom, pci_bus, pci_dev);
+            std::cout << "gpu : " << dev 
+                      <<    " : " << name 
+                      <<    " : " << pci_dom 
+                      <<    " : " << pci_bus
+                      <<    " : " << pci_dev
+                      << std::endl << std::flush;
 
             bind();
 
@@ -739,7 +743,7 @@ int main(int argc, char **argv) {
             double s = getTime();
             fs.open (prof, std::fstream::out | std::fstream::app);
             fs << std::fixed << std::setw(11) << std::setprecision(3) << s
-               << ",app_start,radical.synapse," << uid << ",AGENT_EXECUTING,"
+               << ",app_gpu_start,radical.synapse,0," << uid << ",AGENT_EXECUTING,"
                << std::endl;
             fs.close();
         }
@@ -769,14 +773,18 @@ int main(int argc, char **argv) {
             double s = getTime();
             fs.open (prof, std::fstream::out | std::fstream::app);
             fs << std::fixed << std::setw(11) << std::setprecision(3) << s
-               << ",app_stop,radical.synapse," << uid << ",AGENT_EXECUTING,"
+               << ",app_gpu_stop,radical.synapse,0," << uid << ",AGENT_EXECUTING,"
                << std::endl;
             fs.close();
         }
+        std::cout << std::flush;
+        std::cerr << std::flush;
         return 0;
 
     } catch (std::string e) {
         fprintf(stderr, "gpu-burn failed: %s\n", e.c_str());
+        std::cout << std::flush;
+        std::cerr << std::flush;
         return 123;
     }
 }
