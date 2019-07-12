@@ -36,6 +36,9 @@
 // (Seems that they indeed take the naive dim^3 approach)
 #define OPS_PER_MUL 17188257792ul
 
+#include <streambuf>
+#include <sstream>
+#include <iostream>
 #include <iomanip>
 #include <fstream>
 #include <ctime>
@@ -280,26 +283,23 @@ template <class T> class GPU_Test
 
         void initCompareKernel() {
 
-            const char *kernelFile;
-
+            std::string kernelFile("compare.ptx");
             char* ptx_path = getenv("RP_PTX_PATH");
+           
+            if (ptx_path == NULL)
+                ptx_path = ".";
+           
+            kernelFile.insert(0, "/");
+            kernelFile.insert(0, ptx_path);
 
-            if (ptx_path != NULL) {
-                std::string ptx_loc(ptx_path);
-                ptx_loc.insert(0, std::string("compare.ptx"));
-                kernelFile = ptx_loc.c_str();
-            } else {
-                kernelFile = "compare.ptx";
-            }
+            std::ifstream kernelStream(kernelFile.c_str());
+            std::stringstream data;
+            data << kernelStream.rdbuf();
 
-            {
-                std::ifstream f(kernelFile);
-                checkError(f.good() ? CUDA_SUCCESS : CUDA_ERROR_NOT_FOUND,
-                           std::string("couldn't find file \"") +
-                           kernelFile + "\" from working directory");
-            }
-
-            checkError(cuModuleLoad(&d_module, kernelFile), "load module");
+            if (data == NULL) 
+                throw std::string("invalid module file at " + kernelFile);
+           
+            checkError(cuModuleLoadData(&d_module, data.str().c_str()), "load module");
             checkError(cuModuleGetFunction(&d_function, d_module,
                            d_doubles ? "compareD" : "compare"), "get func");
 

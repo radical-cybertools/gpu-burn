@@ -1,4 +1,5 @@
 
+again: all
 all:
 	nvcc -I${CUDAPATH}/include -arch=compute_30 -ptx compare.cu -o compare.ptx
 	g++ -std=c++11 -O3 -I${CUDAPATH}/include -c gpu_burn-drv.cpp
