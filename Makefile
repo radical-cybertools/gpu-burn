@@ -5,8 +5,8 @@ all:
 	g++ -std=c++11 -o gpu_burn gpu_burn-drv.o -O3 -lcuda -L${CUDAPATH}/lib64 -L${CUDAPATH}/lib -Wl,-rpath=${CUDAPATH}/lib64 -Wl,-rpath=${CUDAPATH}/lib -lcublas -lcudart -o gpu_burn
 
 clean:
-	rm -f *.o *.ptx
+	@rm -vf *.o *.ptx
 
 distclean: clean
-	rm -rf gpu-burn
+	@rm -vrf gpu_burn
 
