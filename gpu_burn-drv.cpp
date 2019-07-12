@@ -280,15 +280,18 @@ template <class T> class GPU_Test
 
         void initCompareKernel() {
 
-            // FIXME: make ptx location flexible
-            std::string ptx_loc = std::string(getenv("RP_PTX_PATH"));
-            std::string ptx_mod = std::string("compare.ptx");
+            const char *kernelFile;
 
-            if (!ptx_loc.empty()) {
-                ptx_mod.insert(0, ptx_loc);
+            char* ptx_path = getenv("RP_PTX_PATH");
+
+            if (ptx_path != NULL) {
+                std::string ptx_loc(ptx_path);
+                ptx_loc.insert(0, std::string("compare.ptx"));
+                kernelFile = ptx_loc.c_str();
+            } else {
+                kernelFile = "compare.ptx";
             }
 
-            const char *kernelFile = ptx_mod.c_str();
             {
                 std::ifstream f(kernelFile);
                 checkError(f.good() ? CUDA_SUCCESS : CUDA_ERROR_NOT_FOUND,
